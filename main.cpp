@@ -5,6 +5,7 @@
 #include "Config.h"
 #include "Database.hpp"
 #include "OrderEngine.hpp"
+#include "Portfolio.hpp"
 #include "boost/program_options.hpp"
 
 using namespace std;

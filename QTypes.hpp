@@ -6,9 +6,10 @@
 
 typedef long long shares;
 typedef double currency;
-typedef time_t date;
+typedef time_t datetime;
 
-struct stock_date_t {
+struct stock_t {
+  datetime date;
   std::string symbol;
   currency open;
   currency close;
@@ -17,10 +18,8 @@ struct stock_date_t {
 };
 
 struct order_t {
-  stock_date_t stock;
-  date purchaseDate;
+  stock_t stock;
   shares numberPurchased;
-  shares symbolVolume;
 };
 
 #endif
