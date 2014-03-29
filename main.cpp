@@ -4,9 +4,8 @@
 #include <string>
 #include "QTypes.hpp"
 #include "Config.h"
-#include "Database.hpp"
-#include "OrderEngine.hpp"
-#include "Portfolio.hpp"
+#include "CassandraDatabase.hpp"
+#include "OrderFactory.hpp"
 #include "boost/program_options.hpp"
 
 using namespace std;
@@ -151,9 +150,24 @@ int main( int argc, char **argv ) {
     //
     // We have the command line arguments, now run the program.
     //
+
+    //
+    // Create the required componenets.
+    // + PythonInterpreter
+    // + Database
+    // + Portfolio
+    // + OrderCreator
+    // + OrderEngine
+    // + PortfolioDatabase
+    //
+    // N.B. only 1 PythonInterpreter should ever be created at a time.
+    //
     PythonInterpreter interpreter( argc, argv );
-    Database database( interpreter, "PyDatabase" );
-    database.get();
+    CassandraDatabase database( interpreter, "PyDatabase" );
+    database.getData();
+    OrderFactory order_factory( database );
+    order_t order = order_factory.createOrder( time( NULL ), "AAPL", 1000 );
+    cout << order.stock.symbol << endl;
 
     return 0;
   } catch( const exception& e ) {

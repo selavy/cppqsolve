@@ -35,7 +35,7 @@ public:
   virtual ~PythonInterpreter();
   void loadModule( std::string moduleName );
   PythonInterpreter::py_ptr loadFunction( std::string functionName, std::string moduleName );
-  
+
 private:
   std::unordered_map<std::string, PyObject*> modulesList_;
 };

@@ -53,6 +53,9 @@ void PythonInterpreter::loadModule( std::string moduleName ) {
   modulesList_.emplace( moduleName, pyModule );
 }
 
+//
+// N.B. return value uses move semantics
+//
 PythonInterpreter::py_ptr PythonInterpreter::loadFunction( std::string functionName, std::string moduleName ) {
   if( modulesList_.count( moduleName.c_str() ) == 0 ) {
     std::string errorString = "Error module not loaded: " + moduleName;
