@@ -2,3 +2,32 @@
 #define _VERSION_MAJOR @_VERSION_MAJOR@
 #define _VERSION_MINOR @_VERSION_MINOR@
 #define _AUTHORS @_AUTHORS@
+
+#include <iostream>
+#include "boost/version.hpp"
+
+void print_license() {
+  using namespace std;
+  cout << "Copyright (C) 2014 Grimberg, Hale, Polsley, Lesslie."
+       << endl
+       << "This is free software: you are free to change and redistribute it."
+       << endl
+       << "There is NO WARRANTY, to the extent permitted by law."
+       << endl;
+}
+
+void print_version( char * program_name ) {
+  using namespace std;
+  cout << program_name << " (QSolve) " << _VERSION_MAJOR << "." << _VERSION_MINOR << endl;
+  print_license();
+  cout << "\nWritten by " << _AUTHORS << endl;
+}
+
+void print_boost_version() {
+  using namespace std;
+  cout << "Using Boost libs version: " << BOOST_VERSION / 100000 << "."
+       << BOOST_VERSION / 100 % 1000 << "."
+       << BOOST_VERSION % 100 << endl;
+}
+
+
