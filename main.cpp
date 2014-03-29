@@ -151,6 +151,8 @@ int main( int argc, char **argv ) {
     //
     // We have the command line arguments, now run the program.
     //
+    Database database( argc, argv, "PyDatabase" );
+    database.get();
 
     return 0;
   } catch( const exception& e ) {

@@ -24,7 +24,7 @@ class Database :
   boost::noncopyable
 {
 public:
-  explicit Database( std::string PyModuleName, std::string PyFuncName = "getData" );
+  explicit Database( int argc, char ** argv, std::string PyModuleName, std::string PyFuncName = "getData" );
   virtual ~Database();
 
   void get();
