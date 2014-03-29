@@ -1,4 +1,4 @@
-#include <Python.h> // get rid of warning about Python.h not being first include
+#include "PythonInterpreter.hpp" // get rid of warning about Python.h not being first include
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -151,7 +151,8 @@ int main( int argc, char **argv ) {
     //
     // We have the command line arguments, now run the program.
     //
-    Database database( argc, argv, "PyDatabase" );
+    PythonInterpreter interpreter( argc, argv );
+    Database database( interpreter, "PyDatabase" );
     database.get();
 
     return 0;

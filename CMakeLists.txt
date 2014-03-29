@@ -24,14 +24,18 @@ configure_file (
 )
 
 include_directories("${qsolve_SOURCE_DIR}" "${qsolve_SOURCE_DIR}/Database" "${qsolve_BINARY_DIR}" "${qsolve_SOURCE_DIR}/OrderEngine" "${qsolve_SOURCE_DIR}/Portfolio")
+include_directories("${qsolve_SOURCE_DIR}/PythonInterpreter")
 add_subdirectory(Database)
 add_subdirectory(OrderEngine)
 add_subdirectory(Portfolio)
+add_subdirectory(PythonInterpreter)
 
 # add executable
 add_executable (qsolve main.cpp)
 target_link_libraries(qsolve Database)
 target_link_libraries(qsolve OrderEngine)
 target_link_libraries(qsolve Portfolio)
+target_link_libraries(qsolve PythonInterpreter)
 target_link_libraries(qsolve boost_program_options)
 target_link_libraries(qsolve ${PYTHON_LIBRARIES})
+

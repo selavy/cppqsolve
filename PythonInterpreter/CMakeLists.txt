@@ -1,0 +1,1 @@
+add_library( PythonInterpreter PythonInterpreter.cpp )

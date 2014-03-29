@@ -1,7 +1,7 @@
 #ifndef _DATABASE_HPP_
 #define _DATABASE_HPP_
 
-#include <Python.h>
+#include "PythonInterpreter.hpp"
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -12,25 +12,16 @@
 // Check out: https://github.com/datastax/cpp-driver
 //
 
-struct PyObjectDeleter {
-  template <typename T>
-  void operator()(T* p) {
-    Py_DECREF(p);
-    p = NULL;
-  }
-};
-
 class Database :
   boost::noncopyable
 {
 public:
-  explicit Database( int argc, char ** argv, std::string PyModuleName, std::string PyFuncName = "getData" );
+  explicit Database( PythonInterpreter& interpreter, std::string PyModuleName, std::string PyFuncName = "getData" );
   virtual ~Database();
-
   void get();
 
 private:
-  std::unique_ptr<PyObject, PyObjectDeleter> PyFunc_;
+  PythonInterpreter::py_ptr PyFunc_;
 };
 
 #endif
