@@ -2,6 +2,7 @@
 #define _VERSION_MAJOR @_VERSION_MAJOR@
 #define _VERSION_MINOR @_VERSION_MINOR@
 #define _AUTHORS @_AUTHORS@
+#define _PROJECT_NAME @_PROJECT_NAME@
 
 #include <iostream>
 #include "boost/version.hpp"
@@ -18,7 +19,7 @@ void print_license() {
 
 void print_version( char * program_name ) {
   using namespace std;
-  cout << program_name << " (QSolve) " << _VERSION_MAJOR << "." << _VERSION_MINOR << endl;
+  cout << program_name << " (" << _PROJECT_NAME << ") " << _VERSION_MAJOR << "." << _VERSION_MINOR << endl;
   print_license();
   cout << "\nWritten by " << _AUTHORS << endl;
 }

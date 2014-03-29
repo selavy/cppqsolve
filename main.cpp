@@ -1,3 +1,4 @@
+#include <Python.h> // get rid of warning about Python.h not being first include
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -39,9 +40,9 @@ int main( int argc, char **argv ) {
   //
   boost::program_options::options_description config( "Configuration options" );
   config.add_options()
-    ( "start,s", boost::program_options::value<string>(&startDate)->required(), "start date for simulation" )
+    ( "start,s", boost::program_options::value<string>(&startDate), "start date for simulation" )
     ( "end,e", boost::program_options::value<string>(&endDate)->default_value("today"), "end date for simulation" )
-    ( "balance,b", boost::program_options::value<currency>(&initialBalance)->default_value(0)->required(), "Initial amount of currency available" )
+    ( "balance,b", boost::program_options::value<currency>(&initialBalance)->default_value(0), "Initial amount of currency available" )
     ;
 
   //
