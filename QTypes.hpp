@@ -4,16 +4,23 @@
 #include <ctime>
 #include <string>
 
-typedef long long amount;
-typedef double capital;
+typedef long long shares;
+typedef double currency;
 typedef time_t date;
 
+struct stock_date_t {
+  std::string symbol;
+  currency open;
+  currency close;
+  shares volume;
+  shares openVolume;
+};
+
 struct order_t {
-  std::string stockSymbol;
+  stock_date_t stock;
   date purchaseDate;
-  amount numberPurchased;
-  amount symbolVolume;
-  capital pricePerShare;
+  shares numberPurchased;
+  shares symbolVolume;
 };
 
 #endif

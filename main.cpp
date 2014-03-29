@@ -19,7 +19,7 @@ int main( int argc, char **argv ) {
   string startDate;
   string endDate;
   string strategyFile;
-  capital initialBalance;
+  currency initialBalance;
 
 
   //
@@ -40,7 +40,7 @@ int main( int argc, char **argv ) {
   config.add_options()
     ( "start,s", boost::program_options::value<string>(&startDate)->required(), "start date for simulation" )
     ( "end,e", boost::program_options::value<string>(&endDate)->default_value("today"), "end date for simulation" )
-    ( "balance,b", boost::program_options::value<capital>(&initialBalance)->default_value(0)->required(), "Initial amount of capital available" )
+    ( "balance,b", boost::program_options::value<currency>(&initialBalance)->default_value(0)->required(), "Initial amount of currency available" )
     ;
 
   //
