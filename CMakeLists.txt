@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 set (_VERSION_MAJOR 0)
 set (_VERSION_MINOR 1)
+set (_AUTHORS "\"Howard Grimberg, Pho Hale, Seth Polsley, and Peter Lesslie\"")
 project (cppqsolve)
 
 # find and link to boost
@@ -22,3 +23,4 @@ add_subdirectory(OrderEngine)
 add_executable (cppqsolve main.cpp)
 target_link_libraries(cppqsolve Database)
 target_link_libraries(cppqsolve OrderEngine)
+target_link_libraries(cppqsolve boost_program_options)
