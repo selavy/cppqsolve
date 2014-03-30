@@ -23,12 +23,19 @@ configure_file (
   "${qsolve_BINARY_DIR}/Config.h"
 )
 
-include_directories("${qsolve_SOURCE_DIR}" "${qsolve_SOURCE_DIR}/Database" "${qsolve_BINARY_DIR}" "${qsolve_SOURCE_DIR}/OrderFactory" "${qsolve_SOURCE_DIR}/Portfolio")
+include_directories("${qsolve_SOURCE_DIR}")
+include_directories("${qsolve_SOURCE_DIR}/Database")
+include_directories("${qsolve_BINARY_DIR}")
+include_directories("${qsolve_SOURCE_DIR}/OrderFactory")
+include_directories("${qsolve_SOURCE_DIR}/Portfolio")
 include_directories("${qsolve_SOURCE_DIR}/PythonInterpreter")
+include_directories("${qsolve_SOURCE_DIR}/StrategyEvaluator")
+
 add_subdirectory(Database)
 add_subdirectory(OrderFactory)
 add_subdirectory(Portfolio)
 add_subdirectory(PythonInterpreter)
+add_subdirectory(StrategyEvaluator)
 
 # add executable
 add_executable (qsolve main.cpp)
@@ -36,6 +43,7 @@ target_link_libraries(qsolve Database)
 target_link_libraries(qsolve OrderFactory)
 target_link_libraries(qsolve Portfolio)
 target_link_libraries(qsolve PythonInterpreter)
+target_link_libraries(qsolve StrategyEvaluator)
 target_link_libraries(qsolve boost_program_options)
 target_link_libraries(qsolve ${PYTHON_LIBRARIES})
 

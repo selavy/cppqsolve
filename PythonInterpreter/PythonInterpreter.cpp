@@ -24,7 +24,7 @@ PythonInterpreter::~PythonInterpreter() {
   Py_Finalize();
 }
 
-void PythonInterpreter::loadModule( std::string moduleName ) {
+void PythonInterpreter::loadModule( const std::string& moduleName ) {
   const auto got = modulesList_.find( moduleName );
   if( got != modulesList_.end() ) {
     //
@@ -56,7 +56,11 @@ void PythonInterpreter::loadModule( std::string moduleName ) {
 //
 // N.B. return value uses move semantics
 //
-PythonInterpreter::py_ptr PythonInterpreter::loadFunction( std::string functionName, std::string moduleName ) {
+PythonInterpreter::py_ptr PythonInterpreter::loadFunction(
+							  const std::string& functionName,
+							  const std::string& moduleName
+							  )
+{
   if( modulesList_.count( moduleName.c_str() ) == 0 ) {
     std::string errorString = "Error module not loaded: " + moduleName;
     throw std::invalid_argument( errorString );
