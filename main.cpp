@@ -8,6 +8,7 @@
 #include "OrderFactory.hpp"
 #include "OrderEngine.hpp"
 #include "OrderFunction.hpp"
+#include "Portfolio.hpp"
 #include "StrategyEvaluator.hpp"
 #include "boost/program_options.hpp"
 
@@ -202,15 +203,26 @@ int main( int argc, char **argv ) {
     // Create an Order Engine
     //
     OrderEngine orderEngine( orderFactory );
+    
+    //
+    // Create an Portfolio
+    //
+    Portfolio portfolio;
 
     //
     // Connect Strategy and Order Engine
     //
     orderEngine.connectToOrderInputSource( strategy.connectToOrderHandler( boost::bind( &OrderEngine::handleOrder, &orderEngine, _1, _2, _3 ) ) );
-    for( int i = 0; i < 10; ++i )
-      strategy.run( time( NULL ) );
+    portfolio.connectToInputSource( orderEngine.connectToPortfolio( boost::bind( &Portfolio::addOrder, &portfolio, _1 ) ) );
+    for( int i = 0; i < 10; ++i ) {
+      time_t date = time( NULL );
+      strategy.run( date );
+      orderEngine.processOrderQueue( date );
+      portfolio.print( cout );
+    }
 
-    orderEngine.printOrderQueue( cout );
+    //orderEngine.printOrderQueue( cout );
+
 					  
 
 

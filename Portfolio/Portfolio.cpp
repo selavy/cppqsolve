@@ -14,6 +14,11 @@ Portfolio::Portfolio( const Portfolio& portfolio ) :
 Portfolio::~Portfolio() {
 }
 
+void Portfolio::connectToInputSource( boost::signals2::connection connection ) {
+  _inputSource.disconnect();
+  _inputSource = connection;
+}
+
 void Portfolio::addOrder( const order_t& aOrder ) {
   const std::string symbol = aOrder.stock.symbol;
   const currency value = aOrder.stock.close;

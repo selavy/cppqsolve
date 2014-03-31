@@ -18,8 +18,8 @@ public:
   typedef boost::signals2::signal<void (const datetime&, const std::string&, long)> signal_t;
 public:
   StrategyEvaluator( PythonInterpreter::py_ptr& strategy );
-  boost::signals2::connection connectToOrderHandler( const signal_t::slot_type& subscriber );
   virtual ~StrategyEvaluator();
+  boost::signals2::connection connectToOrderHandler( const signal_t::slot_type& subscriber );
   void run( datetime date );
   void addOrder( const std::string& symbol, long numOfShares );
 
