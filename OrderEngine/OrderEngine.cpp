@@ -21,14 +21,28 @@ void OrderEngine::connectToOrderInputSource( boost::signals2::connection connect
 
 void OrderEngine::handleOrder( const datetime& date, const std::string& symbol, long numOfShares ) {
   order_t order = orderFactory_.createOrder( date, symbol, numOfShares );
-
-  //
-  // TODO: call slippage function and commission function
-  //
-  orderQueue_.push( order );
+  try {
+    queueLock_.lock();
+    orderQueue_.push( order );
+    queueLock_.unlock();
+  } catch( ... ) {
+    //
+    // make sure to unlock mutex otherwise might get deadlock
+    //
+    queueLock_.unlock();
+    throw std::overflow_error( "dropped order because could not push it on the order queue" );
+  }
 }
 
+boost::signals2::connection OrderEngine::connectToPortfolio( const signal_t::slot_type& subscriber ) {
+  return filledOrderSig_.connect( subscriber );
+}
+
+//
+// don't use this method, just for testing purposes
+//
 std::ostream& OrderEngine::printOrderQueue( std::ostream& os ) {
+  queueLock_.lock();
   while( !orderQueue_.empty() ) {
     order_t order = orderQueue_.front();
     orderQueue_.pop();
@@ -37,3 +51,51 @@ std::ostream& OrderEngine::printOrderQueue( std::ostream& os ) {
   return os;
 }
 
+void OrderEngine::processOrderQueue( const datetime& date ) {
+  //
+  // TODO: Use slippage and commission functions
+  //
+  try {
+    //
+    // get mutex for orderQueue
+    //
+    queueLock_.lock();
+    
+    while( !orderQueue_.empty() ) {
+      order_t order = orderQueue_.front();
+      if( order.stock.date > date ) {
+	//
+	// purchase is for in the future
+	// so leave it on the queue for next time.
+	//
+	break;
+      } else {
+	//
+	// remove order from queue
+	//
+	orderQueue_.pop();
+	
+	//
+	// TODO: check if meet requirements and adjust price using slippage function 
+	//
+
+	//
+	// TODO: adjust price based on commission function
+	//
+
+	filledOrderQueue_.push( order );
+	filledOrderSig_( order );
+      }
+    }
+
+    //
+    // release mutex for orderQueue
+    //
+    queueLock_.unlock();
+  } catch( ... ) {
+    //
+    // make sure to release mutex for orderQueue or may have deadlock
+    //
+    queueLock_.unlock();
+  }
+}
