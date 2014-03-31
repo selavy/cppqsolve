@@ -1,5 +1,7 @@
 #include "StrategyEvaluator.hpp"
 
+extern void registerStrategyObject( StrategyEvaluator& strategy );
+
 StrategyEvaluator::StrategyEvaluator( Database& database, PythonInterpreter::py_ptr& strategy )
   :
   database_( database ),
@@ -38,10 +40,16 @@ void StrategyEvaluator::run( datetime date ) {
   }
 
   PyTuple_SetItem( pArgs, 0, pValue );
+  registerStrategyObject( *this );
   if( PyObject_CallObject( strategy_.get(), pArgs ) == NULL ) {
     if( PyErr_Occurred() ) {
       PyErr_Print();
       throw std::invalid_argument( "Python strategy function could not be called" );
     }
   }
+}
+
+void StrategyEvaluator::addOrder( const std::string& symbol, long numOfShares ) {
+  using namespace std;
+  cout << "Received order for " << symbol << ": " << numOfShares << endl;
 }

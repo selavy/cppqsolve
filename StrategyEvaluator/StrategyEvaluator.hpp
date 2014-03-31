@@ -13,6 +13,7 @@ public:
   StrategyEvaluator( Database& database, PythonInterpreter::py_ptr& strategy );
   virtual ~StrategyEvaluator();
   void run( datetime date );
+  void addOrder( const std::string& symbol, long numOfShares );
 
 private:
   Database& database_;

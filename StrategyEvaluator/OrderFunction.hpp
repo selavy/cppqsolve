@@ -4,7 +4,10 @@
 #include "Python.h"
 #include <iostream>
 #include <string>
+#include <mutex>
+#include "StrategyEvaluator.hpp"
 
 void initQSolveModule();
+void registerStrategyObject( StrategyEvaluator& strategy );
 
 #endif

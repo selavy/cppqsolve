@@ -3,6 +3,9 @@
 static PyObject*
 qsolve_order(PyObject *self, PyObject *args);
 
+static StrategyEvaluator * strategy_ = NULL;
+static std::mutex strategyMutex;
+
 static PyMethodDef QsolveMethods[] = {
   {"order", qsolve_order, METH_VARARGS, "Place an order for a symbol"},
   { NULL, NULL, 0, NULL } /* sentinel value */
@@ -19,7 +22,7 @@ qsolve_order(PyObject *self, PyObject *args) {
   const char * szSymbolName;
   long numShares;
 
-  cout << "Inside order function" << endl;
+  // cout << "Inside order function" << endl;
   if( !PyArg_ParseTuple( args, "sl:order",  &szSymbolName, &numShares ) ) {
     return NULL;
   }
@@ -30,6 +33,13 @@ qsolve_order(PyObject *self, PyObject *args) {
   }
 
   string symbolName( szSymbolName );
-  cout << "symbol = " << symbolName << ": # of shares = " << numShares << endl;
+  if( strategy_ )
+    strategy_->addOrder( symbolName, numShares );
   Py_RETURN_NONE;
+}
+
+void registerStrategyObject( StrategyEvaluator& strategy ) {
+  strategyMutex.lock();
+  strategy_ = &strategy;
+  strategyMutex.unlock();
 }
