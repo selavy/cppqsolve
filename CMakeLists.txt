@@ -30,14 +30,12 @@ include_directories("${qsolve_SOURCE_DIR}/OrderFactory")
 include_directories("${qsolve_SOURCE_DIR}/Portfolio")
 include_directories("${qsolve_SOURCE_DIR}/PythonInterpreter")
 include_directories("${qsolve_SOURCE_DIR}/StrategyEvaluator")
-include_directories("${qsolve_SOURCE_DIR}/OrderFunction")
 
 add_subdirectory(Database)
 add_subdirectory(OrderFactory)
 add_subdirectory(Portfolio)
 add_subdirectory(PythonInterpreter)
 add_subdirectory(StrategyEvaluator)
-add_subdirectory(OrderFunction)
 
 # add executable
 add_executable (qsolve main.cpp)
@@ -46,7 +44,6 @@ target_link_libraries(qsolve OrderFactory)
 target_link_libraries(qsolve Portfolio)
 target_link_libraries(qsolve PythonInterpreter)
 target_link_libraries(qsolve StrategyEvaluator)
-target_link_libraries(qsolve OrderFunction)
 target_link_libraries(qsolve boost_program_options)
 target_link_libraries(qsolve ${PYTHON_LIBRARIES})
 
