@@ -1,2 +1,2 @@
 def getData():
-    print("getData function call\n")
+    return 0;

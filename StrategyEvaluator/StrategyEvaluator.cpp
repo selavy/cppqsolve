@@ -4,11 +4,16 @@ extern void registerStrategyObject( StrategyEvaluator& strategy );
 
 StrategyEvaluator::StrategyEvaluator( PythonInterpreter::py_ptr& strategy )
   :
-  strategy_( strategy )
+  strategy_( strategy ),
+  currentDate_( 0 )
 {
 }
 
 StrategyEvaluator::~StrategyEvaluator() {
+}
+
+boost::signals2::connection StrategyEvaluator::connectToOrderHandler( const signal_t::slot_type& subscriber ) {
+  return orderSig_.connect( subscriber );
 }
 
 void StrategyEvaluator::run( datetime date ) {
@@ -16,6 +21,8 @@ void StrategyEvaluator::run( datetime date ) {
   // Package the date into pArgs and call the strategy
   // function from python.
   //
+
+  currentDate_ = date;
 
   //
   // TODO: Figure out how to handle switching to Python Date
@@ -63,5 +70,6 @@ void StrategyEvaluator::run( datetime date ) {
 
 void StrategyEvaluator::addOrder( const std::string& symbol, long numOfShares ) {
   using namespace std;
-  cout << "Received order for " << symbol << ": " << numOfShares << endl;
+  //cout << "Received order for " << symbol << ": " << numOfShares << endl;
+  orderSig_( currentDate_, symbol, numOfShares );
 }

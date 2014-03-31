@@ -6,6 +6,7 @@
 #include "Config.h"
 #include "CassandraDatabase.hpp"
 #include "OrderFactory.hpp"
+#include "OrderEngine.hpp"
 #include "OrderFunction.hpp"
 #include "StrategyEvaluator.hpp"
 #include "boost/program_options.hpp"
@@ -183,22 +184,35 @@ int main( int argc, char **argv ) {
     // Create a test Cassandra Database
     //
     CassandraDatabase database( interpreter, "PyDatabase" );
-    database.getData();
 
     //
     // Create a test Order Factory
     //
-    OrderFactory order_factory( database );
-    order_t order = order_factory.createOrder( time( NULL ), "AAPL", 1000 );
-    cout << order.stock.symbol << endl;
+    OrderFactory orderFactory( database );
 
     //
     // Create a test Strategy Evaluator
+    //
     const std::string strategyModule = "PyStrategy";
     interpreter.loadModule( strategyModule );
     PythonInterpreter::py_ptr&& strategy_fn = interpreter.loadFunction( "strategy", strategyModule );
     StrategyEvaluator strategy( strategy_fn );
-    strategy.run( time( NULL ) );
+
+    //
+    // Create an Order Engine
+    //
+    OrderEngine orderEngine( orderFactory );
+
+    //
+    // Connect Strategy and Order Engine
+    //
+    orderEngine.connectToOrderInputSource( strategy.connectToOrderHandler( boost::bind( &OrderEngine::handleOrder, &orderEngine, _1, _2, _3 ) ) );
+    for( int i = 0; i < 10; ++i )
+      strategy.run( time( NULL ) );
+
+    orderEngine.printOrderQueue( cout );
+					  
+
 
     return 0;
   } catch( const exception& e ) {
