@@ -9,7 +9,7 @@ SET(CXX11_FLAGS "-std=c++11")
 SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS}" )
 
 #find and link to python
-FIND_PACKAGE(PythonLibs REQUIRED)
+FIND_PACKAGE(PythonLibs 2.7 REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
 # find and link to boost
