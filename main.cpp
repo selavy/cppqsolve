@@ -6,6 +6,7 @@
 #include "Config.h"
 #include "CassandraDatabase.hpp"
 #include "OrderFactory.hpp"
+#include "OrderFunction.hpp"
 #include "StrategyEvaluator.hpp"
 #include "boost/program_options.hpp"
 
@@ -166,6 +167,17 @@ int main( int argc, char **argv ) {
     // Create Interpreter for the Database
     //
     PythonInterpreter interpreter( argc, argv );
+
+    //
+    // TODO: Try to move this into the StrategyEvaluation function
+    // Right now it can't find the module if it is called in the StrategyEvaluator
+    // construtor.  It might have something to do with the linking, so maybe
+    // if StrategyEvaluator and OrderFunction are compiled in the same library
+    // then it might work.
+    //
+    // Initialize the qsolve module
+    //
+    initQSolveModule();
 
     //
     // Create a test Cassandra Database
