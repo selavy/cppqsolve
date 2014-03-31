@@ -197,7 +197,7 @@ int main( int argc, char **argv ) {
     const std::string strategyModule = "PyStrategy";
     interpreter.loadModule( strategyModule );
     PythonInterpreter::py_ptr&& strategy_fn = interpreter.loadFunction( "strategy", strategyModule );
-    StrategyEvaluator strategy( database, strategy_fn );
+    StrategyEvaluator strategy( strategy_fn );
     strategy.run( time( NULL ) );
 
     return 0;

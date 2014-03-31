@@ -2,9 +2,8 @@
 
 extern void registerStrategyObject( StrategyEvaluator& strategy );
 
-StrategyEvaluator::StrategyEvaluator( Database& database, PythonInterpreter::py_ptr& strategy )
+StrategyEvaluator::StrategyEvaluator( PythonInterpreter::py_ptr& strategy )
   :
-  database_( database ),
   strategy_( strategy )
 {
 }
@@ -40,7 +39,20 @@ void StrategyEvaluator::run( datetime date ) {
   }
 
   PyTuple_SetItem( pArgs, 0, pValue );
+
+  //
+  // TODO: Investigate other architecture for connecting this class to the
+  // Python qsolve.order() function
+  //
+
+  //
+  // Have to register this object with the Python Module which is in C
+  //
   registerStrategyObject( *this );
+
+  //
+  // Execute the python strategy function
+  //
   if( PyObject_CallObject( strategy_.get(), pArgs ) == NULL ) {
     if( PyErr_Occurred() ) {
       PyErr_Print();
