@@ -23,6 +23,21 @@ configure_file (
   "${qsolve_BINARY_DIR}/Config.h"
 )
 
+# copy PyDatabase file
+configure_file (
+  "${qsolve_SOURCE_DIR}/PyDatabase.py"
+  "${qsolve_BINARY_DIR}/PyDatabase.py"
+  COPY_ONLY
+)
+
+# copy PyStrategy file
+# just for testing purposes
+configure_file (
+  "${qsolve_SOURCE_DIR}/PyStrategy.py"
+  "${qsolve_BINARY_DIR}/PyStrategy.py"
+  COPY_ONLY
+)
+
 include_directories("${qsolve_SOURCE_DIR}")
 include_directories("${qsolve_SOURCE_DIR}/Database")
 include_directories("${qsolve_BINARY_DIR}")
