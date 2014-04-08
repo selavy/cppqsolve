@@ -1,15 +1,21 @@
 #include "StrategyEvaluator.hpp"
 
+//
+// get rid of cycle in dependency graph
+//
 extern void registerStrategyObject( StrategyEvaluator& strategy );
+extern void unregisterCurrentStrategyObject();
 
 StrategyEvaluator::StrategyEvaluator( PythonInterpreter::py_ptr& strategy )
   :
   strategy_( strategy ),
   currentDate_( 0 )
 {
+  registerStrategyObject( *this );
 }
 
 StrategyEvaluator::~StrategyEvaluator() {
+  unregisterCurrentStrategyObject();
 }
 
 boost::signals2::connection StrategyEvaluator::connectToOrderHandler( const signal_t::slot_type& subscriber ) {
@@ -55,7 +61,7 @@ void StrategyEvaluator::run( datetime date ) {
   //
   // Have to register this object with the Python Module which is in C
   //
-  registerStrategyObject( *this );
+  //registerStrategyObject( *this );
 
   //
   // Execute the python strategy function

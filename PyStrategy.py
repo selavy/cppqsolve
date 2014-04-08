@@ -1,4 +1,4 @@
-import qsolve
+from qsolve import qsolve
 
 def strategy(date):
-    qsolve.order("AAPL", 510);
+    order("AAPL", 510);

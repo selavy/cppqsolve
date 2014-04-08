@@ -43,3 +43,9 @@ void registerStrategyObject( StrategyEvaluator& strategy ) {
   strategy_ = &strategy;
   strategyMutex.unlock();
 }
+
+void unregisterCurrentStrategyObject() {
+  strategyMutex.lock();
+  strategy_ = NULL;
+  strategyMutex.unlock();
+}

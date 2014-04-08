@@ -9,5 +9,6 @@
 
 void initQSolveModule();
 void registerStrategyObject( StrategyEvaluator& strategy );
+void unregisterCurrentStrategyObject();
 
 #endif
