@@ -4,7 +4,8 @@
 #include <string>
 #include "QTypes.hpp"
 #include "Config.h"
-#include "CassandraDatabase.hpp"
+//#include "CassandraDatabase.hpp"
+#include "MockDatabase.hpp"
 #include "OrderFactory.hpp"
 #include "OrderEngine.hpp"
 #include "OrderFunction.hpp"
@@ -22,10 +23,13 @@ int main( int argc, char **argv ) {
   //
 
   string config_file;
-  string startDate;
-  string endDate;
   string strategyFile;
   currency initialBalance;
+  string startDate_sz;
+  string endDate_sz;
+  datetime date;
+  datetime endDate = boost::gregorian::day_clock::local_day();
+
 
   //
   // Generic Options are the options that can only be specified on the command line.
@@ -43,8 +47,8 @@ int main( int argc, char **argv ) {
   //
   boost::program_options::options_description config( "Configuration options" );
   config.add_options()
-    ( "start,s", boost::program_options::value<string>(&startDate), "start date for simulation" )
-    ( "end,e", boost::program_options::value<string>(&endDate)->default_value("today"), "end date for simulation" )
+    ( "start,s", boost::program_options::value<string>(&startDate_sz)->required(), "start date for simulation" )
+    ( "end,e", boost::program_options::value<string>(&endDate_sz), "end date for simulation" )
     ( "balance,b", boost::program_options::value<currency>(&initialBalance)->default_value(0), "Initial amount of currency available" )
     ;
 
@@ -127,16 +131,32 @@ int main( int argc, char **argv ) {
     }
     
     if( vm.count( "start" ) ) {
+      try {
+	boost::gregorian::date startDateTmp( boost::gregorian::from_string( startDate_sz ) );
+	date = startDateTmp;
+      } catch( ... ) {
+	std::string error = "Error: unable to parse start date: " + startDate_sz;
+	throw std::invalid_argument( error.c_str() );
+      }
+
       cout << "Start date set to "
 	   << vm["start"].as<string>()
 	   << endl;
     } else {
-      cout << "Must provide a start date for simulation." << endl;
+      throw std::invalid_argument("Must provide a start date for simulation.");
     }
     
     if( vm.count( "end" ) ) {
+      try {
+	boost::gregorian::date endDateTmp( boost::gregorian::from_string( endDate_sz ) );
+	endDate = endDateTmp;
+      } catch( ... ) {
+	std::string error = "Error: unable to parse end date: " + endDate_sz;
+	throw std::invalid_argument( error.c_str() );
+      }
+      
       cout << "End date set to "
-	   << vm["end"].as<string>()
+	   << endDate_sz
 	   << endl;
     } else {
       cout << "No end date given.  Using current date." << endl;
@@ -185,7 +205,8 @@ int main( int argc, char **argv ) {
     //
     // Create a test Cassandra Database
     //
-    CassandraDatabase database( interpreter, "PyDatabase" );
+    //CassandraDatabase database( interpreter, "PyDatabase" );
+    MockDatabase database;
 
     //
     // Create a test Order Factory
@@ -227,9 +248,7 @@ int main( int argc, char **argv ) {
     //
     orderEngine.connectToOrderInputSource( strategy.connectToOrderHandler( boost::bind( &OrderEngine::handleOrder, &orderEngine, _1, _2, _3 ) ) );
     portfolio.connectToInputSource( orderEngine.connectToPortfolio( boost::bind( &Portfolio::addOrder, &portfolio, _1 ) ) );
-    datetime date = boost::gregorian::day_clock::local_day();
-    for( int i = 0; i < 10; ++i ) {
-      //time_t date = time( NULL );
+    while( date < endDate ) {
       strategy.run( date );
       orderEngine.processOrderQueue( date );
       portfolio.print( cout );

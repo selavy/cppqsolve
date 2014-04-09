@@ -7,7 +7,6 @@
 
 typedef long long shares;
 typedef double currency;
-//typedef time_t datetime;
 typedef boost::gregorian::date datetime;
 
 struct stock_t {
@@ -17,6 +16,11 @@ struct stock_t {
   currency close;
   shares volume;
   shares openVolume;
+
+  stock_t( const datetime& date_, const std::string& symbol_, const currency& open_,
+	   const currency& close_, const shares& volume_, const shares& openVolume_ ) :
+    date( date_ ), symbol( symbol_ ), open( open_ ), close( close_ ), volume( volume_ ),
+    openVolume( openVolume_ ) {}
 };
 
 struct order_t {

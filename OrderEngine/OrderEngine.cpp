@@ -18,7 +18,17 @@ void OrderEngine::connectToOrderInputSource( boost::signals2::connection connect
 }
 
 void OrderEngine::handleOrder( const datetime& date, const std::string& symbol, long numOfShares ) {
+  using namespace std;
   order_t order = orderFactory_.createOrder( date, symbol, numOfShares );
+  if( order.stock.open == 0 ) {
+    //
+    // Attempted to buy on a time point for which we don't have data
+    //
+    //cerr << "Dropped order for " << numOfShares << " of " << symbol << " on "
+    //	 << boost::gregorian::to_iso_extended_string( date ) << endl;
+    return;
+  }
+
   try {
     queueLock_.lock();
     orderQueue_.push( order );

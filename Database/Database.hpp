@@ -3,6 +3,7 @@
 
 #include "boost/noncopyable.hpp"
 #include "QTypes.hpp"
+#include <string>
 
 //
 // Interface for the Database class
@@ -12,7 +13,7 @@ class Database :
 {
 public:
   virtual ~Database() {}
-  virtual stock_t getData( const datetime& date ) const = 0;
+  virtual stock_t getData( const datetime& date, const std::string& symbol ) const = 0;
 };
 
 #endif

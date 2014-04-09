@@ -40,6 +40,14 @@ configure_file (
   COPY_ONLY
 )
 
+# copy table.csv file
+# for MockDatabase class
+configure_file (
+  "${qsolve_SOURCE_DIR}/Database/table.csv"
+  "${qsolve_BINARY_DIR}/table.csv"
+  COPY_ONLY
+)
+
 include_directories("${qsolve_SOURCE_DIR}")
 include_directories("${qsolve_BINARY_DIR}")
 include_directories("${qsolve_SOURCE_DIR}/Database")

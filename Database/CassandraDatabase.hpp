@@ -19,7 +19,7 @@ class CassandraDatabase :
 public:
   explicit CassandraDatabase( PythonInterpreter& interpreter, std::string PyModuleName, std::string PyFuncName = "getData" );
   virtual ~CassandraDatabase();
-  virtual stock_t getData( const datetime& date ) const;
+  virtual stock_t getData( const datetime& date, const std::string& symbol ) const;
 
 private:
   PythonInterpreter::py_ptr PyFunc_;
