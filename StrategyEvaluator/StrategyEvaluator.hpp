@@ -10,7 +10,6 @@
 #include <boost/bind.hpp>
 #include "QTypes.hpp"
 
-
 class StrategyEvaluator :
   boost::noncopyable
 {
@@ -20,7 +19,7 @@ public:
   StrategyEvaluator( PythonInterpreter::py_ptr& strategy );
   virtual ~StrategyEvaluator();
   boost::signals2::connection connectToOrderHandler( const signal_t::slot_type& subscriber );
-  void run( datetime date );
+  void run( const datetime& date );
   void addOrder( const std::string& symbol, long numOfShares );
 
 private:

@@ -11,8 +11,8 @@ CassandraDatabase::CassandraDatabase( PythonInterpreter& interpreter, std::strin
 CassandraDatabase::~CassandraDatabase() {
 }
 
-stock_t CassandraDatabase::getData() const {
+stock_t CassandraDatabase::getData( const datetime& date ) const {
   PyObject_CallObject( PyFunc_.get(), NULL );
-  stock_t retVal = { time( NULL ), "AAPL", 537.71, 537.46, 11495400, 7163009 };
+  stock_t retVal = { date, "AAPL", 537.71, 537.46, 11495400, 7163009 };
   return std::move( retVal );
 }

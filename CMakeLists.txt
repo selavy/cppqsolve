@@ -13,7 +13,9 @@ FIND_PACKAGE(PythonLibs 2.7 REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
 # find and link to boost
-FIND_PACKAGE( Boost 1.40 COMPONENTS program_options REQUIRED )
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+FIND_PACKAGE( Boost 1.40 COMPONENTS thread program_options date_time REQUIRED )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 # configure a header file to pass some CMake settings
@@ -64,4 +66,5 @@ target_link_libraries(qsolve PythonInterpreter)
 target_link_libraries(qsolve StrategyEvaluator)
 target_link_libraries(qsolve boost_program_options)
 target_link_libraries(qsolve ${PYTHON_LIBRARIES})
+target_link_libraries(qsolve ${Boost_LIBRARIES})
 

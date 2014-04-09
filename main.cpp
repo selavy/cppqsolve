@@ -11,6 +11,7 @@
 #include "Portfolio.hpp"
 #include "StrategyEvaluator.hpp"
 #include "boost/program_options.hpp"
+#include "boost/date_time/gregorian/gregorian.hpp"
 
 using namespace std;
 
@@ -53,7 +54,7 @@ int main( int argc, char **argv ) {
   //
   boost::program_options::options_description hidden( "Hidden Options" );
   hidden.add_options()
-    ( "strategy", boost::program_options::value<string>(&strategyFile), "python strategy file" )
+    ( "strategy", boost::program_options::value<string>(&strategyFile)->required(), "python strategy file" )
     ;
 
   //
@@ -194,7 +195,19 @@ int main( int argc, char **argv ) {
     //
     // Create a test Strategy Evaluator
     //
-    const std::string strategyModule = "PyStrategy";
+    std::string strategyModule = vm["strategy"].as<string>();
+    
+    //
+    // Check if the python file given has the .py extension and remove it
+    // if it does, otherwise do nothing
+    //
+    std::string key (".py");
+    auto found = strategyModule.rfind( key );
+    if( found != std::string::npos ) {
+      cout << "found = " << found << endl;
+      strategyModule.erase( found, key.length() );
+    }
+    
     interpreter.loadModule( strategyModule );
     PythonInterpreter::py_ptr&& strategy_fn = interpreter.loadFunction( "strategy", strategyModule );
     StrategyEvaluator strategy( strategy_fn );
@@ -214,17 +227,16 @@ int main( int argc, char **argv ) {
     //
     orderEngine.connectToOrderInputSource( strategy.connectToOrderHandler( boost::bind( &OrderEngine::handleOrder, &orderEngine, _1, _2, _3 ) ) );
     portfolio.connectToInputSource( orderEngine.connectToPortfolio( boost::bind( &Portfolio::addOrder, &portfolio, _1 ) ) );
+    datetime date = boost::gregorian::day_clock::local_day();
     for( int i = 0; i < 10; ++i ) {
-      time_t date = time( NULL );
+      //time_t date = time( NULL );
       strategy.run( date );
       orderEngine.processOrderQueue( date );
       portfolio.print( cout );
+      date += boost::gregorian::days(1);
     }
 
     //orderEngine.printOrderQueue( cout );
-
-					  
-
 
     return 0;
   } catch( const exception& e ) {

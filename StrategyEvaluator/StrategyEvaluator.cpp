@@ -22,7 +22,7 @@ boost::signals2::connection StrategyEvaluator::connectToOrderHandler( const sign
   return orderSig_.connect( subscriber );
 }
 
-void StrategyEvaluator::run( datetime date ) {
+void StrategyEvaluator::run( const datetime& date ) {
   //
   // Package the date into pArgs and call the strategy
   // function from python.
@@ -43,7 +43,7 @@ void StrategyEvaluator::run( datetime date ) {
     throw std::bad_alloc();
   }
 
-  PyObject * pValue = PyInt_FromLong( date );
+  PyObject * pValue = PyString_FromString( boost::gregorian::to_iso_extended_string(currentDate_).c_str() );
   if( pValue == NULL ) {
     if( PyErr_Occurred() ) {
       PyErr_Print();

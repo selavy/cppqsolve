@@ -12,7 +12,7 @@ class Database :
 {
 public:
   virtual ~Database() {}
-  virtual stock_t getData() const = 0;
+  virtual stock_t getData( const datetime& date ) const = 0;
 };
 
 #endif

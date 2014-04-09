@@ -3,10 +3,12 @@
 
 #include <ctime>
 #include <string>
+#include "boost/date_time/gregorian/gregorian.hpp" // does not include I/O
 
 typedef long long shares;
 typedef double currency;
-typedef time_t datetime;
+//typedef time_t datetime;
+typedef boost::gregorian::date datetime;
 
 struct stock_t {
   datetime date;

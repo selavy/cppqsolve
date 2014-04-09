@@ -3,8 +3,6 @@
 OrderEngine::OrderEngine( OrderFactory& orderFactory ) :
   orderFactory_( orderFactory )
 {
-  using namespace std;
-  cout << "Creating an OrderEngine..." << endl;
 }
 
 OrderEngine::~OrderEngine() {

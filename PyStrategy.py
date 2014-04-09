@@ -1,4 +1,7 @@
-from qsolve import qsolve
+from qsolve import *
+
+def initialize(context):
+    context.gs = 'GS'
 
 def strategy(date):
-    order("AAPL", 510);
+    order('AAPL', 510);
