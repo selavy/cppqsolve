@@ -1,7 +1,10 @@
 #include "Portfolio.hpp"
 
-Portfolio::Portfolio() : 
-  balance_( 0 )
+Portfolio::Portfolio( currency initialBalance, const datetime& startDate, const datetime& endDate ) : 
+  balance_( initialBalance ),
+  initialBalance_( initialBalance ),
+  startDate_( startDate ),
+  endDate_( endDate )
 {
 }
 
@@ -15,8 +18,8 @@ Portfolio::~Portfolio() {
 }
 
 void Portfolio::connectToInputSource( boost::signals2::connection connection ) {
-  _inputSource.disconnect();
-  _inputSource = connection;
+  inputSource_.disconnect();
+  inputSource_ = connection;
 }
 
 void Portfolio::addOrder( const order_t& aOrder ) {
@@ -28,6 +31,7 @@ void Portfolio::addOrder( const order_t& aOrder ) {
   // Push the order onto the queue mapped to that symbol
   // 
   holdings_[symbol.c_str()].push_back( aOrder );
+  orderQ_.push( aOrder );
 
   //
   // Update the current balance:
@@ -37,8 +41,7 @@ void Portfolio::addOrder( const order_t& aOrder ) {
   balance_ -= value * numOfShares;
 }
 
-void Portfolio::print( std::ostream& os ) {
-#ifdef _PRINT_
+void Portfolio::print( std::ofstream& os ) {
   if( balance_ >= 0 ) {
     os << "Balance: $" << balance_ << std::endl;
   } else {
@@ -46,7 +49,7 @@ void Portfolio::print( std::ostream& os ) {
   }
 
   if(!holdings_.empty()) {
-    //os << "Holdings:\nsymbol\tshares\n---------------" << std::endl;
+    os << "Holdings:\nsymbol\tshares\n---------------" << std::endl;
     
     for( auto& it : holdings_ ) {
       //
@@ -71,5 +74,56 @@ void Portfolio::print( std::ostream& os ) {
     }
   }
   os << std::endl;
-#endif
+}
+
+//
+// TODO: maybe take a database as an argument so that
+// I can look up the latest price, but then what
+// do I do when I don't have data for a stock?
+//
+void Portfolio::printHistory( std::ofstream& os ) {
+  using namespace std;
+  using namespace boost::gregorian;
+
+  //
+  // Print csv column headers
+  //
+  os << "Date,Portfolio Value" << endl;
+
+  currency currentBalance = initialBalance_;
+  unordered_map<std::string, shares> currentPortfolio;
+  unordered_map<std::string, currency> latestPrice;
+
+  for( datetime curr = startDate_; curr <= endDate_; curr += boost::gregorian::days( 1 ) ) {
+    while(! orderQ_.empty() ) {
+      order_t order = orderQ_.front();
+      if( order.stock.date > curr ) {
+	//
+	// done processing orders for this day
+	//
+	break;
+      } else {
+	//
+	// remove order from queue
+	//
+	orderQ_.pop();
+      }
+      
+      //
+      // This will automatically account for 
+      currentBalance -= order.stock.open * order.numberPurchased;
+      if( order.stock.open != 0 ) {
+	currentPortfolio[order.stock.symbol] += order.numberPurchased;
+	latestPrice[order.stock.symbol] = order.stock.open;
+      }
+    }
+
+    currency totalValue = 0;
+    for( auto& it : currentPortfolio ) {
+      totalValue += it.second * latestPrice[it.first];
+    }
+
+    os << to_iso_extended_string( curr ) << ",";
+    os << totalValue + currentBalance << endl;
+  }
 }

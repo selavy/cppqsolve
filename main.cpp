@@ -29,7 +29,8 @@ int main( int argc, char **argv ) {
   string endDate_sz;
   datetime date;
   datetime endDate;
-
+  //ostream out;
+  ofstream ofs;
 
   //
   // Generic Options are the options that can only be specified on the command line.
@@ -50,6 +51,7 @@ int main( int argc, char **argv ) {
     ( "start,s", boost::program_options::value<string>(&startDate_sz)->required(), "start date for simulation" )
     ( "end,e", boost::program_options::value<string>(&endDate_sz), "end date for simulation" )
     ( "balance,b", boost::program_options::value<currency>(&initialBalance)->default_value(0), "Initial amount of currency available" )
+    ( "output,o", boost::program_options::value<string>(), "Output file location, if one already exists, it will be overwritten" )
     ;
 
   //
@@ -121,8 +123,8 @@ int main( int argc, char **argv ) {
     // Can check if a variable is set with vm.count( VAR_NAME ) > 0.
     //
     if( vm.count( "help" ) ) {
-#ifdef _PRINT_
-      cout << visible << endl;
+#ifdef DEBUG
+      cerr << visible << endl;
 #endif
       return 0;
     }
@@ -140,8 +142,8 @@ int main( int argc, char **argv ) {
 	std::string error = "Error: unable to parse start date: " + startDate_sz;
 	throw std::invalid_argument( error.c_str() );
       }
-#ifdef _PRINT_
-      cout << "Start date set to "
+#ifdef DEBUG
+      cerr << "Start date set to "
 	   << vm["start"].as<string>()
 	   << endl;
 #endif
@@ -158,26 +160,39 @@ int main( int argc, char **argv ) {
 	throw std::invalid_argument( error.c_str() );
       }
       
-#ifdef _PRINT_
-      cout << "End date set to "
+#ifdef DEBUG
+      cerr << "End date set to "
 	   << endDate_sz
 	   << endl;
 #endif
     } else {
       endDate = boost::gregorian::day_clock::local_day();
-#ifdef _PRINT_
-      cout << "No end date given.  Using current date." << endl;
+#ifdef DEBUG
+      cerr << "No end date given.  Using current date." << endl;
 #endif
+    }
+
+    if( vm.count( "output" ) ) {
+      ofs.open( vm["output"].as<string>().c_str(), ofstream::out | ofstream::trunc );
+      if(! ofs.good() ) {
+	string error("Unable to open output file: ");
+	error += vm["output"].as<string>();
+	throw std::invalid_argument( error.c_str() );
+      }
+    } else {
+      ofs.copyfmt( cout );
+      ofs.clear( cout.rdstate() );
+      ofs.basic_ios<char>::rdbuf( cout.rdbuf() );
     }
     
     if( vm.count( "strategy" ) ) {
-#ifdef _PRINT_
-      cout << "Strategy file set to "
+#ifdef DEBUG
+      cerr << "Strategy file set to "
 	   << vm["strategy"].as<string>()
 	   << endl;
 #endif
     } else {
-      cout << "Must provide a strategy file." << endl;
+      cerr << "Must provide a strategy file." << endl;
     }
 
     //
@@ -249,32 +264,42 @@ int main( int argc, char **argv ) {
     
     //
     // Create an Portfolio
+    // TODO: Get initial balance
     //
-    Portfolio portfolio;
+    Portfolio portfolio( 0, date, endDate );
 
     //
     // Connect Strategy and Order Engine
     //
     orderEngine.connectToOrderInputSource( strategy.connectToOrderHandler( boost::bind( &OrderEngine::handleOrder, &orderEngine, _1, _2, _3 ) ) );
     portfolio.connectToInputSource( orderEngine.connectToPortfolio( boost::bind( &Portfolio::addOrder, &portfolio, _1 ) ) );
-    while( date < endDate ) {
+    while( date <= endDate ) {
       strategy.run( date );
       orderEngine.processOrderQueue( date );
-#ifdef _PRINT_
-      portfolio.print( cout );
+#ifdef DEBUG
+      ofs << boost::gregorian::to_iso_extended_string( date ) << endl;
+      portfolio.print( ofs );
 #endif
       date += boost::gregorian::days(1);
     }
 
+    portfolio.printHistory( ofs );
+    
+    if( ofs.is_open() ) {
+      ofs.close();
+    }
     return 0;
   } catch( const exception& e ) {
     //
     // Most likely store() threw an exception meaning that an option
     // was not recognized, or one of the required options was not given.
     //
-    cout << e.what() << endl;
-    cout << endl;
-    cout << visible << endl;
+    if( ofs.is_open() ) {
+      ofs.close();
+    }
+    cerr << e.what() << endl;
+    cerr << endl;
+    cerr << visible << endl;
     return 0;
   }
 }
