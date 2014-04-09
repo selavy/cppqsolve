@@ -159,20 +159,19 @@ void Portfolio::printHistory( std::ofstream& os ) const {
       totalValue += it.second * latestPrice[it.first];
     }
 
-#define DEBUG
 #ifdef DEBUG
     os << "DEBUG: ";
     for( auto& it : currentPortfolio ) {
       os << it.first << " : " << it.second << " @ " << latestPrice[it.first] << endl;
     }
-    os << "Balance: " << currentBalance << endl;
-    os << "Total Value: " << totalValue << endl;
-    os << "Total Spent: " << totalSpent << endl;
-    os << "Total Made: " << totalMade << endl;
+    os << "DEBUG: Balance: " << currentBalance << endl;
+    os << "DEBUG: Total Value: " << totalValue << endl;
+    os << "DEBUG: Total Spent: " << totalSpent << endl;
+    os << "DEBUG: Total Made: " << totalMade << endl;
 #endif
     os << to_iso_extended_string( curr ) << ",";
     os << totalValue + currentBalance << ",";
-    os << (totalSpent == 0) ? 0.000 : (static_cast<double>(totalMade - totalSpent) / static_cast<double>(totalSpent));
+    os << ((totalSpent == 0) ? 0.000 : ((totalMade - totalSpent) / totalSpent));
     os << endl;
 
 #ifdef DEBUG
@@ -180,9 +179,10 @@ void Portfolio::printHistory( std::ofstream& os ) const {
 #endif
   }
 
-
+#ifdef DEBUG
   os << "FINAL: " << endl;
   for( auto& it : currentPortfolio ) {
     os << it.first << " : " << it.second << " @ " << latestPrice[it.first] << endl;
   }
+#endif
 }
