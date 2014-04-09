@@ -28,7 +28,7 @@ int main( int argc, char **argv ) {
   string startDate_sz;
   string endDate_sz;
   datetime date;
-  datetime endDate = boost::gregorian::day_clock::local_day();
+  datetime endDate;
 
 
   //
@@ -121,7 +121,9 @@ int main( int argc, char **argv ) {
     // Can check if a variable is set with vm.count( VAR_NAME ) > 0.
     //
     if( vm.count( "help" ) ) {
+#ifdef _PRINT_
       cout << visible << endl;
+#endif
       return 0;
     }
     
@@ -138,10 +140,11 @@ int main( int argc, char **argv ) {
 	std::string error = "Error: unable to parse start date: " + startDate_sz;
 	throw std::invalid_argument( error.c_str() );
       }
-
+#ifdef _PRINT_
       cout << "Start date set to "
 	   << vm["start"].as<string>()
 	   << endl;
+#endif
     } else {
       throw std::invalid_argument("Must provide a start date for simulation.");
     }
@@ -155,17 +158,24 @@ int main( int argc, char **argv ) {
 	throw std::invalid_argument( error.c_str() );
       }
       
+#ifdef _PRINT_
       cout << "End date set to "
 	   << endDate_sz
 	   << endl;
+#endif
     } else {
+      endDate = boost::gregorian::day_clock::local_day();
+#ifdef _PRINT_
       cout << "No end date given.  Using current date." << endl;
+#endif
     }
     
     if( vm.count( "strategy" ) ) {
+#ifdef _PRINT_
       cout << "Strategy file set to "
 	   << vm["strategy"].as<string>()
 	   << endl;
+#endif
     } else {
       cout << "Must provide a strategy file." << endl;
     }
@@ -225,7 +235,6 @@ int main( int argc, char **argv ) {
     std::string key (".py");
     auto found = strategyModule.rfind( key );
     if( found != std::string::npos ) {
-      cout << "found = " << found << endl;
       strategyModule.erase( found, key.length() );
     }
     
@@ -251,11 +260,11 @@ int main( int argc, char **argv ) {
     while( date < endDate ) {
       strategy.run( date );
       orderEngine.processOrderQueue( date );
+#ifdef _PRINT_
       portfolio.print( cout );
+#endif
       date += boost::gregorian::days(1);
     }
-
-    //orderEngine.printOrderQueue( cout );
 
     return 0;
   } catch( const exception& e ) {

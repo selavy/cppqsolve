@@ -38,6 +38,7 @@ void Portfolio::addOrder( const order_t& aOrder ) {
 }
 
 void Portfolio::print( std::ostream& os ) {
+#ifdef _PRINT_
   if( balance_ >= 0 ) {
     os << "Balance: $" << balance_ << std::endl;
   } else {
@@ -45,7 +46,7 @@ void Portfolio::print( std::ostream& os ) {
   }
 
   if(!holdings_.empty()) {
-    os << "Holdings:\nsymbol\tshares\n---------------" << std::endl;
+    //os << "Holdings:\nsymbol\tshares\n---------------" << std::endl;
     
     for( auto& it : holdings_ ) {
       //
@@ -55,7 +56,14 @@ void Portfolio::print( std::ostream& os ) {
       //
       shares numShares = 0;
       for( auto& symbol : it.second ) {
-	numShares += symbol.numberPurchased;
+	if( symbol.stock.open != 0 ) {
+	  numShares += symbol.numberPurchased;
+	} else {
+	  //
+	  // handle order where we didn't have stock information
+	  //
+	  continue;
+	}
       }
       if( numShares != 0 ) {
 	os << it.first << "\t" << numShares << std::endl;
@@ -63,4 +71,5 @@ void Portfolio::print( std::ostream& os ) {
     }
   }
   os << std::endl;
+#endif
 }
