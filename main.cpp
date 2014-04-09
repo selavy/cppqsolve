@@ -29,7 +29,6 @@ int main( int argc, char **argv ) {
   string endDate_sz;
   datetime date;
   datetime endDate;
-  //ostream out;
   ofstream ofs;
 
   //
@@ -180,6 +179,11 @@ int main( int argc, char **argv ) {
 	throw std::invalid_argument( error.c_str() );
       }
     } else {
+      //
+      // cout should never be copied, instead having to copy each
+      // data member individually.
+      // see https://stdcxx.apache.org/doc/stdlibug/34-2.html
+      //
       ofs.copyfmt( cout );
       ofs.clear( cout.rdstate() );
       ofs.basic_ios<char>::rdbuf( cout.rdbuf() );
