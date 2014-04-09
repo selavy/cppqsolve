@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
-#include <queue>
 
 class Portfolio {
 public:
@@ -19,7 +18,8 @@ public:
   void connectToInputSource( boost::signals2::connection connection );
   void addOrder( const order_t& aOrder );
   void print( std::ofstream& os );
-  void printHistory( std::ofstream& os );
+  void printTransactionList( std::ofstream& os ) const;
+  void printHistory( std::ofstream& os ) const;
 
 private:
   currency balance_;
@@ -27,7 +27,7 @@ private:
   datetime startDate_;
   datetime endDate_;
   std::unordered_map<std::string, std::vector<order_t>> holdings_;
-  std::queue<order_t> orderQ_;
+  std::vector<order_t> orderQ_;
   boost::signals2::connection inputSource_;
 };
 

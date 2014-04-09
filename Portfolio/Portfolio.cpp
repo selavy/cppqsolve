@@ -31,7 +31,7 @@ void Portfolio::addOrder( const order_t& aOrder ) {
   // Push the order onto the queue mapped to that symbol
   // 
   holdings_[symbol.c_str()].push_back( aOrder );
-  orderQ_.push( aOrder );
+  orderQ_.push_back( aOrder );
 
   //
   // Update the current balance:
@@ -76,27 +76,51 @@ void Portfolio::print( std::ofstream& os ) {
   os << std::endl;
 }
 
+void Portfolio::printTransactionList( std::ofstream& os ) const {
+  using namespace std;
+  using namespace boost::gregorian;
+  
+  os << "Date,Symbol,Action,#Shares,Price,$Amount" << endl;
+
+  for( const auto& it : orderQ_ ) {
+    if( it.numberPurchased == 0 ) {
+      continue;
+    }
+
+    os << to_iso_extended_string( it.stock.date ) << ",";
+    os << it.stock.symbol << ",";
+    os << ((it.numberPurchased > 0) ? "BUY" : "SELL") << ",";
+    os << it.numberPurchased << ",";
+    os << it.stock.open << ",";
+    os << it.stock.open * it.numberPurchased;
+    os << endl;
+  }
+}
+
 //
 // TODO: maybe take a database as an argument so that
 // I can look up the latest price, but then what
 // do I do when I don't have data for a stock?
 //
-void Portfolio::printHistory( std::ofstream& os ) {
+void Portfolio::printHistory( std::ofstream& os ) const {
   using namespace std;
   using namespace boost::gregorian;
 
   //
   // Print csv column headers
   //
-  os << "Date,Portfolio Value" << endl;
+  os << "Date,Portfolio Value,Returns" << endl;
 
   currency currentBalance = initialBalance_;
+  currency totalSpent = 0;
+  currency totalMade = 0;
   unordered_map<std::string, shares> currentPortfolio;
   unordered_map<std::string, currency> latestPrice;
+  auto orderIt = orderQ_.begin();
 
   for( datetime curr = startDate_; curr <= endDate_; curr += boost::gregorian::days( 1 ) ) {
-    while(! orderQ_.empty() ) {
-      order_t order = orderQ_.front();
+    while( orderIt != orderQ_.end() ) {
+      order_t order = *orderIt;
       if( order.stock.date > curr ) {
 	//
 	// done processing orders for this day
@@ -106,12 +130,24 @@ void Portfolio::printHistory( std::ofstream& os ) {
 	//
 	// remove order from queue
 	//
-	orderQ_.pop();
+	++orderIt;
       }
       
       //
       // This will automatically account for 
       currentBalance -= order.stock.open * order.numberPurchased;
+      if( order.numberPurchased > 0 ) {
+	//
+	// if bought, then add to Total Amount Spent
+	//
+	totalSpent += order.stock.open * order.numberPurchased;
+      } else {
+	//
+	// order.numberPurchased will be negative, so subtract to avoid
+	// multiplying by -1
+	//
+	totalMade -= order.stock.open * order.numberPurchased;
+      }
       if( order.stock.open != 0 ) {
 	currentPortfolio[order.stock.symbol] += order.numberPurchased;
 	latestPrice[order.stock.symbol] = order.stock.open;
@@ -123,7 +159,30 @@ void Portfolio::printHistory( std::ofstream& os ) {
       totalValue += it.second * latestPrice[it.first];
     }
 
+#define DEBUG
+#ifdef DEBUG
+    os << "DEBUG: ";
+    for( auto& it : currentPortfolio ) {
+      os << it.first << " : " << it.second << " @ " << latestPrice[it.first] << endl;
+    }
+    os << "Balance: " << currentBalance << endl;
+    os << "Total Value: " << totalValue << endl;
+    os << "Total Spent: " << totalSpent << endl;
+    os << "Total Made: " << totalMade << endl;
+#endif
     os << to_iso_extended_string( curr ) << ",";
-    os << totalValue + currentBalance << endl;
+    os << totalValue + currentBalance << ",";
+    os << (totalSpent == 0) ? 0.000 : (static_cast<double>(totalMade - totalSpent) / static_cast<double>(totalSpent));
+    os << endl;
+
+#ifdef DEBUG
+    os << endl;
+#endif
+  }
+
+
+  os << "FINAL: " << endl;
+  for( auto& it : currentPortfolio ) {
+    os << it.first << " : " << it.second << " @ " << latestPrice[it.first] << endl;
   }
 }

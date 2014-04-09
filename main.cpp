@@ -288,6 +288,10 @@ int main( int argc, char **argv ) {
     }
 
     portfolio.printHistory( ofs );
+
+    ofs << "\n\n" <<endl;
+    
+    portfolio.printTransactionList( ofs );
     
     if( ofs.is_open() ) {
       ofs.close();
