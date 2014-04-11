@@ -24,7 +24,7 @@ PythonInterpreter::~PythonInterpreter() {
   Py_Finalize();
 }
 
-void PythonInterpreter::loadModule( const std::string& moduleName ) {
+void PythonInterpreter::loadModule( std::string moduleName ) {
   const auto got = modulesList_.find( moduleName );
   if( got != modulesList_.end() ) {
     //

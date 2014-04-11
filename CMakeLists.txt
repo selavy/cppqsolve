@@ -5,7 +5,8 @@ set (_AUTHORS "\"Howard Grimberg, Pho Hale, Seth Polsley, and Peter Lesslie\"")
 set (_PROJECT_NAME "\"QSolve\"")
 project (qsolve)
 
-SET(CXX11_FLAGS "-std=c++11")
+SET( DEBUG_FLAGS "-fsanitizer=address -fno-omit-frame-pointer" )
+SET( CXX11_FLAGS "--std=c++11")
 SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS}" )
 
 #find and link to python

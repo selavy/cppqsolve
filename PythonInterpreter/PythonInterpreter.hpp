@@ -33,7 +33,7 @@ public:
 public:
   PythonInterpreter( int argc, char **argv );
   virtual ~PythonInterpreter();
-  void loadModule( const std::string& moduleName );
+  void loadModule( std::string moduleName );
   PythonInterpreter::py_ptr loadFunction( const std::string& functionName, const std::string& moduleName );
 
 private:
