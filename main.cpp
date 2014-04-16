@@ -7,6 +7,7 @@
 #include "boost/program_options.hpp"
 #include "boost/date_time/gregorian/gregorian.hpp"
 #include "Context.hpp"
+#include "MockDatabase.hpp"
 
 using namespace std;
 
@@ -212,11 +213,21 @@ int main( int argc, char **argv ) {
 	strategyModule.erase( found, key.length() );
       }
 
+      //
+      // Setup the embedded python interpreter
+      //
       Py_Initialize();
       PySys_SetArgv( argc, argv );
-      object PyStrategy = import( "PyStrategy" );
+
+      //
+      // Find the strategy module (Python script)
+      //
+      object PyStrategy = import( strategyModule.c_str() );
       dict PyStrategy_Namespace( PyStrategy.attr( "__dict__" ) );
-      //object Create_Context = exec( "context = Context()", PyStrategy_Namespace );
+
+      //
+      // Wrap our Context class in a python object
+      //
       object PyContext = (
 			  class_<Context>( "Context" )
 			  .def( "order", &Context::order )
@@ -224,14 +235,34 @@ int main( int argc, char **argv ) {
 			  .def_readonly( "balance", &Context::balance_ )
 			  .def_readonly( "date", &Context::date_ )
 			  )();
+      //
+      // Create the database that the python object will use
+      //
+      MockDatabase * database = new MockDatabase;
+
+      //
+      // We can always extract the Context object from the PyObject* wrapper
+      // with extract()
+      //
+      Context& context = extract<Context&>( PyContext );
+      context.setDatabase( database ).setDate( date );
+
+      //
+      // Add our new PyObject* "Context" to the global dictionary
+      // so that the python script can use it
+      //
       PyStrategy_Namespace["context"] = PyContext;
       
       //      for( ; date <= endDate; date += boost::gregorian::days(1); ) {      
+
       //
       // execute PyStrategy.strategy()
       //
       object RetVal = exec( "strategy(context)", PyStrategy_Namespace );
+
       //}
+
+      free( database );
     } catch( ... ) {
       if( PyErr_Occurred() ) {
 	PyErr_Print();

@@ -53,7 +53,8 @@ CONFIGURE_FILE(
 INCLUDE_DIRECTORIES("${qsolve_SOURCE_DIR}")
 INCLUDE_DIRECTORIES("${qsolve_BINARY_DIR}")
 
-ADD_LIBRARY( Context Context.cpp OrderFactory.cpp )
+ADD_LIBRARY(Context Context.cpp OrderFactory.cpp)
+ADD_LIBRARY(MockDatabase MockDatabase.cpp)
 
 # add executable
 #PYTHON_ADD_MODULE(qsolve_ext PyContext.cpp)
@@ -61,5 +62,5 @@ ADD_LIBRARY( Context Context.cpp OrderFactory.cpp )
 #TARGET_LINK_LIBRARIES(qsolve_ext ${Boost_Libraries})
 
 ADD_EXECUTABLE(qsolve main.cpp)
-TARGET_LINK_LIBRARIES(qsolve Context)
+TARGET_LINK_LIBRARIES(qsolve Context MockDatabase)
 TARGET_LINK_LIBRARIES(qsolve boost_program_options ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
