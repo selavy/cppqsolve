@@ -1,1 +1,0 @@
-add_library( Portfolio Portfolio.cpp )

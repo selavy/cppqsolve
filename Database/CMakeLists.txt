@@ -1,1 +1,0 @@
-add_library(Database CassandraDatabase.cpp MockDatabase.cpp)

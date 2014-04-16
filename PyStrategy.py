@@ -1,14 +1,12 @@
-from qsolve import *
-
 trade = True;
 
 def initialize(context):
     context.gs = 'GS'
 
-def strategy(date):
+def strategy(context):
     global trade
     if trade:
-        order('AAPL', 50);
+        context.order('AAPL', 50);
     else:
-        order('AAPL', -50);
+        context.order('AAPL', -50);
     trade ^= True;

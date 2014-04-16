@@ -1,18 +1,12 @@
-#include "PythonInterpreter.hpp" // get rid of warning about Python.h not being first include
+#include <boost/python.hpp>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include "QTypes.hpp"
 #include "Config.h"
-//#include "CassandraDatabase.hpp"
-#include "MockDatabase.hpp"
-#include "OrderFactory.hpp"
-#include "OrderEngine.hpp"
-#include "OrderFunction.hpp"
-#include "Portfolio.hpp"
-#include "StrategyEvaluator.hpp"
 #include "boost/program_options.hpp"
 #include "boost/date_time/gregorian/gregorian.hpp"
+#include "Context.hpp"
 
 using namespace std;
 
@@ -203,6 +197,51 @@ int main( int argc, char **argv ) {
     // We have the command line arguments, now run the program.
     //
 
+    
+    try {
+      using namespace boost::python;
+    
+      //
+      // Check if the python file given has the .py extension and remove it
+      // if it does, otherwise do nothing
+      //
+      std::string strategyModule = vm["strategy"].as<string>();
+      std::string key (".py");
+      auto found = strategyModule.rfind( key );
+      if( found != std::string::npos ) {
+	strategyModule.erase( found, key.length() );
+      }
+
+      Py_Initialize();
+      PySys_SetArgv( argc, argv );
+      object PyStrategy = import( "PyStrategy" );
+      dict PyStrategy_Namespace( PyStrategy.attr( "__dict__" ) );
+      //object Create_Context = exec( "context = Context()", PyStrategy_Namespace );
+      object PyContext = (
+			  class_<Context>( "Context" )
+			  .def( "order", &Context::order )
+			  .def( "__getitem__", &Context::operator[] )
+			  .def_readonly( "balance", &Context::balance_ )
+			  .def_readonly( "date", &Context::date_ )
+			  )();
+      PyStrategy_Namespace["context"] = PyContext;
+      
+      //      for( ; date <= endDate; date += boost::gregorian::days(1); ) {      
+      //
+      // execute PyStrategy.strategy()
+      //
+      object RetVal = exec( "strategy(context)", PyStrategy_Namespace );
+      //}
+    } catch( ... ) {
+      if( PyErr_Occurred() ) {
+	PyErr_Print();
+      } else {
+	cerr << "Caught unknown exception" << endl;
+      }
+    }
+
+
+    /*
     //
     // Create the required componenets.
     // + PythonInterpreter
@@ -292,10 +331,13 @@ int main( int argc, char **argv ) {
     ofs << "\n\n" <<endl;
     
     portfolio.printTransactionList( ofs );
+    */
     
     if( ofs.is_open() ) {
       ofs.close();
     }
+
+
     return 0;
   } catch( const exception& e ) {
     //

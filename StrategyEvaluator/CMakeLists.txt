@@ -1,1 +1,0 @@
-add_library( StrategyEvaluator StrategyEvaluator.cpp OrderFunction.cpp )

@@ -1,5 +1,15 @@
 #include "Portfolio.hpp"
 
+/*
+Portfolio::Portfolio() :
+  balance_( 0 ),
+  initialBalance_( 0 ),
+  startDate_( boost::gregorian::day_clock::local_day() ),
+  endDate_( boost::gregorian::day_clock::local_day() )
+{
+}
+*/
+
 Portfolio::Portfolio( currency initialBalance, const datetime& startDate, const datetime& endDate ) : 
   balance_( initialBalance ),
   initialBalance_( initialBalance ),
@@ -185,4 +195,8 @@ void Portfolio::printHistory( std::ofstream& os ) const {
     os << it.first << " : " << it.second << " @ " << latestPrice[it.first] << endl;
   }
 #endif
+}
+
+void Portfolio::getHolding() const {
+  std::cout << "getHolding()" << std::endl;
 }

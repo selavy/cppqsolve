@@ -9,8 +9,14 @@
 #include <string>
 #include <vector>
 
-class Portfolio {
+#include <boost/python.hpp>
+
+struct Portfolio {
 public:
+  //
+  // Need default Constructor for the python module
+  //
+  //Portfolio();
   explicit Portfolio( currency initialBalance = 0, const datetime& startDate = boost::gregorian::day_clock::local_day(), const datetime& endDate = boost::gregorian::day_clock::local_day() );
   Portfolio( const Portfolio& portfolio );
   virtual ~Portfolio();
@@ -21,6 +27,8 @@ public:
   void printTransactionList( std::ofstream& os ) const;
   void printHistory( std::ofstream& os ) const;
 
+  void getHolding() const;
+  
 private:
   currency balance_;
   currency initialBalance_;
