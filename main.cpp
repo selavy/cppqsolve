@@ -234,6 +234,7 @@ int main( int argc, char **argv ) {
 			  class_<Context>( "Context" )
 			  .def( "order", &Context::order )
 			  .def( "__getitem__", &Context::operator[] )
+			  .def( "get_data", &Context::getData )
 			  .def_readonly( "balance", &Context::balance_ )
 			  .def_readonly( "date", &Context::date_ )
 			  )();
@@ -249,7 +250,7 @@ int main( int argc, char **argv ) {
       // with extract()
       //
       Context& context = extract<Context&>( PyContext );
-      context.setOrderEngine( orderEngine ).setStartDate( date ).setEndDate( endDate );
+      context.setDatabase( database ).setOrderEngine( orderEngine ).setStartDate( date ).setEndDate( endDate );
 
       //
       // Add our new PyObject* "Context" to the global dictionary

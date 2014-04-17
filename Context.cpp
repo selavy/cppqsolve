@@ -1,6 +1,6 @@
 #include "Context.hpp"
 
-Context::Context() : balance_( 0 ), portfolio_( new Portfolio() ), orderEngine_( NULL ) {}
+Context::Context() : balance_( 0 ), portfolio_( new Portfolio() ), orderEngine_( NULL ), database_( NULL ) {}
 
 Context::~Context() {
 }
@@ -28,6 +28,11 @@ long Context::operator[]( const char * symbol ) {
 Context& Context::setOrderEngine( OrderEngine * orderEngine ) {
   orderEngine_ = orderEngine;
   orderEngine_->connectToPortfolio( boost::bind( &Portfolio::addOrder, portfolio_.get(), _1 ) );
+  return( *this );
+}
+
+Context& Context::setDatabase( Database * database ) {
+  database_ = database;
   return( *this );
 }
 
@@ -61,4 +66,12 @@ void Context::processOrderQueue( const datetime& date ) {
   if( orderEngine_ != NULL ) {
     orderEngine_->processOrderQueue( date );
   }
+}
+
+stock_t Context::getData( const datetime& date, const std::string& symbol ) const {
+  if( database_ == NULL ) {
+    throw std::runtime_error( "Error in Context->getData(): Database not set!" );
+  }
+
+  return database_->getData( date, symbol );
 }
