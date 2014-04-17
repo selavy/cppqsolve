@@ -7,6 +7,8 @@
 #include "boost/program_options.hpp"
 #include "boost/date_time/gregorian/gregorian.hpp"
 #include "Context.hpp"
+#include "OrderEngine.hpp"
+#include "OrderFactory.hpp"
 #include "MockDatabase.hpp"
 
 using namespace std;
@@ -239,13 +241,15 @@ int main( int argc, char **argv ) {
       // Create the database that the python object will use
       //
       MockDatabase * database = new MockDatabase;
+      OrderFactory * orderFactory = new OrderFactory( *database );
+      OrderEngine * orderEngine = new OrderEngine( *orderFactory );
 
       //
       // We can always extract the Context object from the PyObject* wrapper
       // with extract()
       //
       Context& context = extract<Context&>( PyContext );
-      context.setDatabase( database ).setDate( date );
+      context.setOrderEngine( orderEngine ).setStartDate( date ).setEndDate( endDate );
 
       //
       // Add our new PyObject* "Context" to the global dictionary
@@ -253,16 +257,22 @@ int main( int argc, char **argv ) {
       //
       PyStrategy_Namespace["context"] = PyContext;
       
-      //      for( ; date <= endDate; date += boost::gregorian::days(1); ) {      
+      for( ; date <= endDate; date += boost::gregorian::days(1) ) {      
+	//
+	// execute PyStrategy.strategy()
+	//
+	context.setDate( date );
+	object RetVal = exec( "strategy(context)", PyStrategy_Namespace );
+	context.processOrderQueue( date );
+      }
 
-      //
-      // execute PyStrategy.strategy()
-      //
-      object RetVal = exec( "strategy(context)", PyStrategy_Namespace );
-
-      //}
+      context.printTransactionList( ofs );
+      cout << "\n\n\n\n\n" << endl;
+      context.printHistory( ofs );
 
       free( database );
+      free( orderFactory );
+      free( orderEngine );
     } catch( ... ) {
       if( PyErr_Occurred() ) {
 	PyErr_Print();

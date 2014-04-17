@@ -53,7 +53,7 @@ CONFIGURE_FILE(
 INCLUDE_DIRECTORIES("${qsolve_SOURCE_DIR}")
 INCLUDE_DIRECTORIES("${qsolve_BINARY_DIR}")
 
-ADD_LIBRARY(Context Context.cpp OrderFactory.cpp)
+ADD_LIBRARY(Context Context.cpp OrderFactory.cpp OrderEngine.cpp Portfolio.cpp)
 ADD_LIBRARY(MockDatabase MockDatabase.cpp)
 
 # add executable

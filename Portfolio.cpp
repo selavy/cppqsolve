@@ -200,3 +200,20 @@ void Portfolio::printHistory( std::ofstream& os ) const {
 void Portfolio::getHolding() const {
   std::cout << "getHolding()" << std::endl;
 }
+
+void Portfolio::add( const std::string& key, long amount ) {
+  portfolio_[key] += amount;
+}
+
+shares Portfolio::get( const char * symbol ) {
+  std::string key( symbol );
+  return portfolio_[key];
+}
+
+void Portfolio::setStartDate( const datetime& startDate ) {
+  startDate_ = startDate;
+}
+
+void Portfolio::setEndDate( const datetime& endDate ) {
+  endDate_ = endDate;
+}
