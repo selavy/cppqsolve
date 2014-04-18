@@ -17,7 +17,7 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_LIBS OFF)
 SET(Boost_USE_STATIC_RUNTIME OFF)
-FIND_PACKAGE(Boost 1.40 COMPONENTS python thread program_options date_time REQUIRED)
+FIND_PACKAGE(Boost 1.40 COMPONENTS python program_options date_time REQUIRED)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 
 # configure a header file to pass some CMake settings
@@ -55,11 +55,6 @@ INCLUDE_DIRECTORIES("${qsolve_BINARY_DIR}")
 
 ADD_LIBRARY(Context Context.cpp OrderFactory.cpp OrderEngine.cpp Portfolio.cpp)
 ADD_LIBRARY(MockDatabase MockDatabase.cpp)
-
-# add executable
-#PYTHON_ADD_MODULE(qsolve_ext PyContext.cpp)
-#TARGET_LINK_LIBRARIES(qsolve_ext Context)
-#TARGET_LINK_LIBRARIES(qsolve_ext ${Boost_Libraries})
 
 ADD_EXECUTABLE(qsolve main.cpp)
 TARGET_LINK_LIBRARIES(qsolve Context MockDatabase)

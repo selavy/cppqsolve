@@ -1,6 +1,6 @@
 trade = True;
 
-def initialize(context):
+def init(context):
     context.gs = 'GS'
 
 def strategy(context):

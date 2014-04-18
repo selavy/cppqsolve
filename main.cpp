@@ -257,6 +257,20 @@ int main( int argc, char **argv ) {
       // so that the python script can use it
       //
       PyStrategy_Namespace["context"] = PyContext;
+
+      try {
+	if( PyStrategy_Namespace["init"] ) {
+	  exec( "init(context)", PyStrategy_Namespace );
+	}
+      } catch( ... ) {
+	//
+	// If init is not defined, then PyStrategy_Namespace["context"] operation
+	// will set a python error, so just ignore it
+	//
+	if( PyErr_Occurred() ) {
+	  PyErr_Clear();
+	}
+      }
       
       for( ; date <= endDate; date += boost::gregorian::days(1) ) {      
 	//
@@ -268,7 +282,7 @@ int main( int argc, char **argv ) {
       }
 
       context.printTransactionList( ofs );
-      cout << "\n\n\n\n\n" << endl;
+      ofs << "\n\n\n\n\n" << endl;
       context.printHistory( ofs );
 
       free( database );

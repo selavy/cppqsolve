@@ -12,9 +12,6 @@ Context::~Context() {
 // what should be done with it
 //
 void Context::order( const char * symbol, shares amount ) {
-  using namespace std;
-  cout << "Received order for: " << symbol << " at " << amount << endl;
-
   if( orderEngine_ != NULL ) {
     std::string aSymbol( symbol );
     orderEngine_->handleOrder( date_, aSymbol, amount );
