@@ -1,6 +1,7 @@
 trade = True;
 
 def init(context):
+    print "print to log from init...."
     context.gs = 'GS'
 
 def strategy(context):
